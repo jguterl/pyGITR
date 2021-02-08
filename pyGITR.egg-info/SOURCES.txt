@@ -1,0 +1,10 @@
+README.md
+setup.py
+pyGITR/__init__.py
+pyGITR/gmsh_helper.py
+pyGITR/pyGITR.py
+pyGITR.egg-info/PKG-INFO
+pyGITR.egg-info/SOURCES.txt
+pyGITR.egg-info/dependency_links.txt
+pyGITR.egg-info/requires.txt
+pyGITR.egg-info/top_level.txt

@@ -17,26 +17,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from mpl_toolkits.mplot3d.art3d import Line3DCollection
 from matplotlib import collections as mc
-
-
-class GeomHelper():
-    '''Methods for computations of geometrical properties.'''
-
-    @staticmethod
-    def Norm(Vector):
-        return np.sqrt(np.sum(Vector**2, 1))
-
-    @staticmethod
-    def Cross(V1, V2):
-        CrossVec = np.copy(V1)
-        CrossVec[:, 0] = V1[:, 1]*V2[:, 2]-V1[:, 2]*V2[:, 1]
-        CrossVec[:, 1] = V1[:, 2]*V2[:, 0]-V1[:, 0]*V2[:, 2]
-        CrossVec[:, 2] = V1[:, 0]*V2[:, 1]-V1[:, 1]*V2[:, 0]
-        return CrossVec
-
-    @staticmethod
-    def Dot(V1, V2):
-        return np.sum(V1*V2, 1)
+from pyGITR.math_helper import *
 
 class GeomGroup():
     '''Methods to handle groups of elements.'''
@@ -159,24 +140,19 @@ class GeomInput(GeomHelper,GeomGroup):
         CA = -AC
         CB = -BC
 
-        dAB = self.Norm(AB)
-        dBC = self.Norm(BC)
-        dAC = self.Norm(AC)
+        dAB = Norm(AB)
+        dBC = Norm(BC)
+        dAC = Norm(AC)
 
         s = (dAB+dBC+dAC)/2
         self.GeomInput['area'] = np.sqrt(s*(s-dAB)*(s-dBC)*(s-dAC))
-        self.normalVec = self.Cross(AB, AC)
+        self.normalVec = Cross(AB, AC)
         self.GeomInput['a'] = self.normalVec[:, 0]
         self.GeomInput['b'] = self.normalVec[:, 1]
         self.GeomInput['c'] = self.normalVec[:, 2]
-        self.GeomInput['d'] = -self.Dot(self.normalVec, A)
-        self.GeomInput['plane_norm'] = self.Norm(self.normalVec)
-        #self.abcd = np.hstack((self.normalVec,d[:,None]));
+        self.GeomInput['d'] = -Dot(self.normalVec, A)
+        self.GeomInput['plane_norm'] = Norm(self.normalVec)
 
-        # plane_norm(i) = norm(normalVec);
-
-        # BCxBA(i) = sign(dot(cross(BC,BA),normalVec));
-        # CAxCB(i) = sign(dot(cross(CA,CB),normalVec));
         self.Centroid = 1/3*(np.sum(self.Triangles, 1)).squeeze()
         # rr = sqrt(centroid(1).^2 + centroid(2).^2);
         # density(i) = interpn(y,z,dens,rr,centroid(3));
@@ -278,6 +254,7 @@ class GeomPlot(GeomGroup):
         self.ax.set_xlim3d(mn, mx)
         self.ax.set_ylim3d(mn, mx)
         self.ax.set_zlim3d(mn, mx)
+
 class GeomSetup(GeomInput, GeomPlot):
 
     def __init__(self, mesh=None, ax=None, Verbose=False):

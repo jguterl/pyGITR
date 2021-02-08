@@ -7,7 +7,6 @@
 """
 import gmsh
 from pyGITR.gmsh_helper import SetGroups
-import math
 
 # Clean up gmsh session if script already executed
 # (Re)initialize gsmh session
@@ -146,15 +145,6 @@ SetGroups(gmsh.model, TagBoundBox, "BoundBox", [0, 0, 255])
 
 # Generate 2D mesh
 gmsh.model.mesh.generate(2)
-# DiMES = gmsh.model.addPhysicalGroup(dim=2, tags=[TagDiMES[0][0][1]])
-# Blocks = gmsh.model.addPhysicalGroup(dim=2, tags=CleanEntities(TagExtBlock,True))
-# gmsh.model.setPhysicalName(dim=2, tag=DiMES, name="DiMES")
-# gmsh.model.setPhysicalName(dim=2, tag=Blocks, name="Blocks")
-# gmsh.model.mesh.getElements(2, 2000)
-# tBlocks=[(2,g) for g in gmsh.model.getEntitiesForPhysicalGroup(2,Blocks)]
-# gmsh.model.setColor(tBlocks,0,255,0)
-# gmsh.model.setColor(TagDiMES[0],255,255,0)
-
 
 # Launch the GUI to see the results:
 gmsh.fltk.run()
@@ -162,5 +152,5 @@ gmsh.fltk.run()
 # Write mesh into a meshio format
 gmsh.write("leading_edges_DiMES.msh")
 
-# close gmsh session
-# gmsh.finalize()
+# close gmsh session. Comment when working on the geometry.
+gmsh.finalize()
