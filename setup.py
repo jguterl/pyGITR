@@ -16,7 +16,7 @@ long_description = (here / 'README.md').read_text(encoding='utf-8')
 print('=== Setup pyGITR ===')
 setup(
     name='pyGITR',
-    version_format='v0.1',
+    version_format='v0.2',
     #setup_requires=[setuptools-git-version],
     description='Toolbox for GITR',
     packages=find_packages(),
