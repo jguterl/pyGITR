@@ -1,7 +1,0 @@
-gmsh
-libconf
-click
-numpy
-matplotlib
-math3d
-netCDF4
