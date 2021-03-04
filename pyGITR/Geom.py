@@ -71,7 +71,7 @@ class GeomGroup():
             Idx = np.arange(0, self.NElems, dtype=int)
         return Idx
 
-class GeomInput(GeomHelper,GeomGroup):
+class GeomInput(GeomGroup):
 
     def __init__(self):
         self.GeomInput = {}

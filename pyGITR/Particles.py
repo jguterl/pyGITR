@@ -178,6 +178,9 @@ class ParticleDistribution():
             assert A in list(self.Particles.keys()), 'Cannot find "{}" among list of attributes available:{}'.format(A, list(self.Particles.keys()))
             self.Particles[A] = self.Particles[A]*ScaleFactor
 
+    def RotateAngle(self, Field:str, theta:float, phi:float, Degree=True):
+        self.Rotate(Field, [0,1,0], theta, Degree)
+        self.Rotate(Field, [0,0,1], phi, Degree)
 
     def Rotate(self, Field:str, AxisVector:np.ndarray or list, Angle: float, Degree=True) -> None:
         """
