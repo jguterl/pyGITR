@@ -7,10 +7,11 @@ from typing import Callable
 import matplotlib.pyplot as plt
 import pydoc
 import netCDF4
+import os
 
 class Distribs():
 
-    def Gaussian(x: np.ndarray = np.linspace(-10, 10, 10000), sigma: float = 1, mu: float = 0, beta: float = 0, Normalized=True):
+    def Gaussian(x: np.ndarray = np.linspace(-10, 10, 10000), sigma: float = 1.0, mu: float = 0.0, beta: float = 0.0, Normalized=True):
         f = np.abs(x)**beta*np.exp(-1.0/2.0*((x-mu)/sigma)**2)
         if beta > 0:
             f[np.argwhere(x<0)] = 0
@@ -39,8 +40,10 @@ class Distribs():
             f[np.argwhere(x < xmin)] = 0
         if xmax is not None:
             f[np.argwhere(x > xmax)] = 0
+
         if Normalized:
             f = f/Integrale(f, x, Array=False)
+
         return f
 
     def SinCos(x=np.linspace(0, np.pi/2, 10000), xmin=None, xmax=None, Normalized=True):
@@ -230,9 +233,10 @@ class ParticleDistribution():
             if k != 'Np' and k in self.ListAttr and type(v) == np.ndarray:
                 assert len(v.shape)<2 and v.shape[0] == self.Particles['Np'], 'Wrong dimension for particle attribute {}  with shape {}. Np={}'.format(k,v.shape,self.Particles['Np'])
 
-    def WriteParticleFile(self,FileName, Foramt='f8'):
+    def WriteParticleFile(self,FileName, Format='f8', Folder='input'):
         self.CheckParticles()
-        File = netCDF4.Dataset(FileName, 'w', format='NETCDF4')
+        File = netCDF4.Dataset(os.path.join(Folder,FileName), 'w', format='NETCDF4')
+
         np = File.createDimension('nP', self.Particles['Np'])
         Var = {}
         for k in self.ListAttr:

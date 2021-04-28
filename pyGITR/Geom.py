@@ -51,20 +51,31 @@ class GeomGroup():
                 print('GroupID must be a str or int or a list of str or int.')
                 return np.array([])
         Idx = np.array([])
-        for G in SelectedGroups:
-            ListEntities = self.Model.getEntitiesForPhysicalGroup(2, G)
+
+        if GroupID == []:
+            ListEntities = self.Model.getEntities(2)
             if self.Verbose:
-                print('Selected group:', G, ' Entities:', ListEntities)
-            for L in ListEntities:
+                print('Selected group:', [], ' Entities:', ListEntities)
+            for L in [L[1] for L in ListEntities]:
                 Elems = self.Mesh.getElements(2, L)[1][0]
                 if self.Verbose:
                     print('Entities:', L, ' elems:', Elems)
                 Idx = np.append(Idx, Elems)
+        else:
+            for G in SelectedGroups:
+                ListEntities = self.Model.getEntitiesForPhysicalGroup(2, G)
+                if self.Verbose:
+                    print('Selected group:', G, ' Entities:', ListEntities)
+                for L in ListEntities:
+                    Elems = self.Mesh.getElements(2, L)[1][0]
+                    if self.Verbose:
+                        print('Entities:', L, ' elems:', Elems)
+                    Idx = np.append(Idx, Elems)
 
         return Idx.astype('int')
 
     def GetGroupIdx(self, GroupID):
-        if GroupID is not None or GroupID == []:
+        if GroupID is not None and GroupID != []:
             Idx = self.GetGroupElements(GroupID)
             Idx = Idx-1
         else:
@@ -95,10 +106,13 @@ class GeomInput(GeomGroup):
 
         self.DefaultsAttr['3D']['Scalar'] = {'periodic': 0,
                                              'periodic_bc_x': 0,
+                                             'periodic_bc_y': 0,
                                              'theta0': 0.0,
                                              'theta1': 0.0,
                                              'periodic_bc_x0': 0.0,
-                                             'periodic_bc_x1': 0.0
+                                             'periodic_bc_x1': 0.0,
+                                             'periodic_bc_y0': 0.0,
+                                             'periodic_bc_y1': 0.0
                                              }
 
     def SetDefaultsAttr(self, GeoDim='3D'):
@@ -165,6 +179,14 @@ class GeomInput(GeomGroup):
             for i in range(3):
                 if self.Verbose: print( 'setting "{}{}"'.format(s, i+1))
                 self.GeomInput['{}{}'.format(s, i+1)] = self.Triangles[:, i, j].squeeze()
+
+    def SetAttr(self,Attribute,Value):
+        if self.GeomInput.get(Attribute) is None:
+                print('Scalar attribute "{}" not found in GeomInput ... Creating a new scalar')
+                self.GeomInput[Attribute] = Value
+        else:
+            self.GeomInput[Attribute] = Value
+
 
     def SetElemAttr(self, GroupID, Attribute, Value):
         assert self.NElems > 0, 'Number of elements must be >0 to set \
@@ -342,15 +364,15 @@ class GeomSetup(GeomInput, GeomPlot):
         return {'geom':D}
 
 
-    def WriteGeomFile(self, FileName='gitrGeom.cfg', GeoDim='3D'):
+    def WriteGeomFile(self, FileName='gitrGeom.cfg', Folder='',GeoDim='3D', OverWrite=False):
 
-        FileName = os.path.abspath(FileName)
+        FileName = os.path.abspath(os.path.join(Folder,FileName))
         print('Writing geometry config into {} ...'.format(FileName))
 
         self.CheckGeomInput()
 
         if os.path.exists(FileName):
-            if not click.confirm('File {} exists.\n Do you want to overwrite it?'.format(FileName), default=True):
+            if not OverWrite and not click.confirm('File {} exists.\n Do you want to overwrite it?'.format(FileName), default=True):
                 return
 
         with io.open(FileName,'w') as f:

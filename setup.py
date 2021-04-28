@@ -43,7 +43,7 @@ setup(
     # keywords='sample, setuptools, development',  # Optional
     #packages=[''],
     python_requires='>=3.5, <4',
-    install_requires=['gmsh','libconf','click','numpy','matplotlib','math3d','netCDF4'],  # Optional
+    install_requires=['libconf','click','numpy','matplotlib','math3d','netCDF4'],  # Optional
     #extras_require={  # Optional
     #    'dev': ['check-manifest'],
     #    'test': ['coverage'],
