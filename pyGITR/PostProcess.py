@@ -11,6 +11,8 @@ from SimManager import rget
 
 class PostProcess():
     def __init__(self, Simulations = None, **kwargs):
+        if type(Simulations) == str:
+            Simulations = np.load(Simulations,allow_pickle=True)
         if type(Simulations) == np.ndarray:
             Simulations = Simulations.tolist()
         if type(Simulations) != list:
@@ -40,7 +42,13 @@ class PostProcess():
             self.IdxArray[S.Idx] = S.Id
         if len(self.Simulations)>0:
             assert all([S.Parameters == self.Simulations[0].Parameters for S in Simulations] )
+            for S in self.Simulations:
+                S.DicParameters = dict((k,v) for k,v in zip(S.Parameters,S.Values))
+            
             self.Parameters = self.Simulations[0].Parameters
+            self.DicParameters = dict((k,list(set([S.DicParameters[k] for S in self.Simulations]))) for k in self.Parameters)
+
+            
         else:
             self.Parameters = []
 
@@ -94,8 +102,12 @@ class PostProcess():
                 GetData(self.ax[i,j],Sim, **kwargs)
                 Str = ' \n '.join(["{}={}".format(p,v) for (p,v) in zip(Sim.Parameters, Sim.Values)])
                 self.ax[i,j].set_title(Str, loc='center', wrap=True)
-
-
+                
+    def CumulateParticleData(self):
+        if not hasattr(self, 'CumulativeData'):
+            self.CumulativeData = {}
+        for p in ['ParticleStartData','ParticleEndData']:
+            self.CumulativeData[p] = {'Data':dict((k,np.concatenate(tuple([S.Data[p]['Data'][k] for S in self.Simulations]))) for k in self.Simulations[0].Data[p]['Data'].keys())}
 
         # x = [Post.Simulations[k].Values[PlotAxis] for k in Post.IdxArray.take(j,axis=GroupAxis)]
         # p = [Post.Simulations[k].Values[GroupAxis] for k in Post.IdxArray.take(j,axis=GroupAxis)]
@@ -148,7 +160,11 @@ def GetDistribParticle(ParticleData):
     Data={}
     for k in ParticleData.variables.keys():
         Data[k] = np.array(ParticleData.variables.get(k))
-    Data['E'] = 1/2*Data['amu']*(Data['vz']**2+Data['vy']**2+Data['vx']**2)*units.mp/units.eV*(units.V)**2
+    v = np.sqrt(Data['vz']**2+Data['vy']**2+Data['vx']**2)
+    vp = np.sqrt(Data['vy']**2+Data['vx']**2)
+    Data['E'] = 1/2*Data['amu']*(v**2)*units.mp/units.eV*(units.V)**2
+    Data['theta'] = np.arccos(np.abs(Data['vz'])/v)
+    Data['phi'] = np.arccos(np.abs(Data['vx'])/vp)
     return Data
 
 def GetHistoryParticle(ParticleData):

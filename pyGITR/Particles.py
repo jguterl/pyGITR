@@ -33,7 +33,7 @@ class Distribs():
             f = f/Integrale(f, x, Array=False)
         return f
 
-    def Uniform(x=np.linspace(0, 1, 10000), xmin=None, xmax=None, Normalized=True):
+    def Uniform(x=np.linspace(0, 1, 10000000), xmin=None, xmax=None, Normalized=True):
         assert not (xmin is not None and xmax is not None and xmin >= xmax), "xmin cannot be <= xmax"
         f = np.full(x.shape, 1)
         if xmin is not None:
