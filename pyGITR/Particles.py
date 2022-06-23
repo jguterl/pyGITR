@@ -2,7 +2,8 @@
 
 
 import numpy as np
-from pyGITR.math_helper import *
+#from pyGITR.math_helper import *
+from math_helper import *
 from typing import Callable
 import matplotlib.pyplot as plt
 import pydoc
